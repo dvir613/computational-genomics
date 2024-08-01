@@ -1,4 +1,4 @@
-from ...assignment3 import genomical_statistics
+from ...assignment3.genomical_statistics import calc_pssm
 
 
 def calculate_gc_content(sequence):
