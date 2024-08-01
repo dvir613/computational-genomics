@@ -3,11 +3,13 @@ import pandas as pd
 
 # load necessary files:
 PSSM_matrices = pd.ExcelFile("PSSM.xlsx")
+
 anti_SD_hybridization_energy = pd.read_excel("asd_hyb.xlsx")  # anti-Shine-Dalgarno hybridization energy
 anti_SD_hybridization_energy.columns = ['Sequence', 'Energy']
 # Create a dictionary from the DataFrame to map string to value
 mapping_anti_SD_hybridization_energy = pd.Series(anti_SD_hybridization_energy['Energy'].values,
                                                  index=anti_SD_hybridization_energy['Sequence']).to_dict()
+
 
 def calculate_gc_content(sequence):
     gc_count = sequence.count('G') + sequence.count('C')
@@ -20,6 +22,7 @@ def calculate_pssm(sequence):
 
 
 # function that calculates the score of matching to the PSSMs (from PSSM.xlsx) for each index in the sequence
+# need to run it once for each PSSM from the excel file
 def score_pssm_match(pssm, sequence):
     nucleotides = ['A', 'C', 'G', 'T']
     window_length = pssm.shape[1]
