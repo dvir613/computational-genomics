@@ -43,10 +43,6 @@ def score_pssm_match(pssm, sequence):
         # print(subsequence)
         score = sum(pssm[nucleotides.index(nt), position] for position, nt in enumerate(subsequence))
         idx_pssm_score[idx] = score
-        # idx_pssm_score[idx] = 0
-        # subsequence = sequence[idx:idx+window_length]
-        # for position, nt in enumerate(subsequence):
-        #     idx_pssm_score[idx] += pssm[nucleotides.index(nt), position]
     return idx_pssm_score
 
 
