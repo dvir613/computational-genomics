@@ -8,6 +8,7 @@ from features import *  # imports everything (functions and constants)
 
 save_data = True
 
+
 def preprocess_data(excel_file_path):
     # Load the sequence data
     sequence_df = pd.read_excel(excel_file_path, sheet_name='Variants data', engine='openpyxl')
@@ -34,6 +35,10 @@ def preprocess_data(excel_file_path):
     sequence_df = pd.concat([sequence_df, anti_sd_df], axis=1)
 
     return sequence_df
+
+
+def remove_zro_variance(sequence_df):
+    pass
 
 
 def save_dataframe_in_chunks(df, filename, chunk_size=100000):
