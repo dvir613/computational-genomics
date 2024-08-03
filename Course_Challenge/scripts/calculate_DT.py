@@ -3,12 +3,9 @@ import matplotlib.pyplot as plt
 
 
 def calculate_differences(excel_file_path):
-    # Load the Excel file
-    xls = pd.ExcelFile(excel_file_path)
-
     # Load the data from the sheets
-    without_dnt_df = pd.read_excel(xls, sheet_name=xls.sheet_names[1])
-    with_dnt_df = pd.read_excel(xls, sheet_name=xls.sheet_names[2])
+    without_dnt_df = pd.read_excel(excel_file_path, sheet_name='luminescence without DNT', engine='openpyxl')
+    with_dnt_df = pd.read_excel(excel_file_path, sheet_name='luminescence with DNT', engine='openpyxl')
 
     # Check if both dataframes have the same shape
     if without_dnt_df.shape != with_dnt_df.shape:
@@ -55,7 +52,7 @@ def plot_differences(ydata):
 
 if __name__ == "__main__":
     scatter_plot = True
-    save_y_data = False
+    save_target_data = False
     excel_file_path = "../data/Train_data.xlsx"
     y_data = calculate_differences(excel_file_path)
 
@@ -65,6 +62,7 @@ if __name__ == "__main__":
     if scatter_plot:
         plot_differences(y_data)
 
-    if save_y_data:
-        # save Y data (only in the first time)
-        y_data.to_excel("../data/y_data.xlsx", index=False)
+    if save_target_data:
+        # save target data (only in the first time)
+        y_data.to_csv("../data/Target_data.csv", index=False)
+        print("Saved data to ../data/Target_data.csv")
