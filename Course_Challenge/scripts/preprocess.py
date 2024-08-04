@@ -6,33 +6,37 @@ from Course_Challenge.utils.consts import load_pssm_matrices, clean_sequence
 from features import *  # imports everything (functions and constants)
 from igem_features.nucli_features import *
 from igem_features.entropy import *
+from igem_features.promoter_strength import *
+from igem_features.delta_G.TX_prediction import *
 
-save_data = False
+save_data = True
 
 PSSM_matrices = load_pssm_matrices()
 
 
 def generate_features(excel_file_path):
     # Load the sequence data
-    features_df = pd.read_excel(excel_file_path, sheet_name='Variants data', engine='openpyxl')
+    variants_df = pd.read_excel(excel_file_path, sheet_name='Variants data', engine='openpyxl')
+    # variants_df = variants_df.iloc[:30, :]
+    features_df = pd.read_excel(excel_file_path, sheet_name='Features', engine='openpyxl')
     # features_df = features_df.iloc[:30, :]
 
     # Clean the sequences
-    features_df['Variant sequence'] = features_df['Variant sequence'].apply(clean_sequence)
+    features_df['Variant sequence'] = variants_df['Variant sequence'].apply(clean_sequence)
 
     # calculate GC content
     features_df['GC_Content'] = features_df['Variant sequence'].apply(calculate_gc_content)
 
-    # folding energy window=40
-    folding_window_features = features_df['Variant sequence'].apply(calculate_folding_energy_window)
-    # Convert folding energy into a sparse DataFrame
-    folding_window_df = pd.DataFrame(folding_window_features.tolist(), columns=[f'folding_energy_window_40_{i}' for i in
-                                                                  range(folding_window_features.iloc[0].size)]).fillna(0)
-    # Concatenate the folding energy features to the original DataFrame
-    features_df = pd.concat([features_df, folding_window_df], axis=1)
-
-    # folding energy full
-    features_df['folding_energy'] = features_df['Variant sequence'].apply(calculate_folding_energy)
+    # # folding energy window=40
+    # folding_window_features = features_df['Variant sequence'].apply(calculate_folding_energy_window)
+    # # Convert folding energy into a sparse DataFrame
+    # folding_window_df = pd.DataFrame(folding_window_features.tolist(), columns=[f'folding_energy_window_40_{i}' for i in
+    #                                                               range(folding_window_features.iloc[0].size)]).fillna(0)
+    # # Concatenate the folding energy features to the original DataFrame
+    # features_df = pd.concat([features_df, folding_window_df], axis=1)
+    #
+    # # folding energy full
+    # features_df['folding_energy'] = features_df['Variant sequence'].apply(calculate_folding_energy)
 
     # Process each PSSM matrix
     for sheet_name in PSSM_matrices.sheet_names:
@@ -65,6 +69,22 @@ def generate_features(excel_file_path):
     # Join the new features with the original DataFrame if needed
     features_df = pd.concat([features_df, entropy_feature_df], axis=1)
 
+    # promoter strength
+    # Calculate promoter strength and concatenate them to the DataFrame
+    promoter_energy_features = features_df['Variant sequence'].apply(sliding_window_promoter_strength)
+    # Convert promoter strength features into a sparse DataFrame
+    promoter_energy_df = pd.DataFrame(promoter_energy_features.tolist(), columns=[f'promoter_energy_{i}' for i in
+                                                                  range(promoter_energy_features.iloc[0].size)]).fillna(0)
+    # Concatenate the promoter strength features to the original DataFrame
+    features_df = pd.concat([features_df, promoter_energy_df], axis=1)
+
+    # delta G
+    # Calculate delta G and concatenate them to the DataFrame
+    delta_G_features = process_deltaG_sequences(features_df['Variant sequence'])
+
+    # Concatenate the delta G features to the original DataFrame
+    features_df = pd.concat([features_df, delta_G_features], axis=1)
+
     # drop the sequences column
     features_df.drop(columns='Variant sequence', inplace=True)
 
@@ -72,7 +92,7 @@ def generate_features(excel_file_path):
 
 
 def remove_zero_variance_features(X: pd.DataFrame):
-    zero_variance_cols = X.columns[X.var() == 0]
+    zero_variance_cols = X.columns[X.var() < X.mean() * 0.001]
     return X.drop(columns=zero_variance_cols), zero_variance_cols
 
 

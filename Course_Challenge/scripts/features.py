@@ -73,6 +73,15 @@ def anti_SD_hybridization_energy(sequence):
     return idx_energy
 
 
+# this data is provided and there is no need to calculate it
+# # function that calculate the number of codons that have changed in the variant regarding the control
+# def calculate_codon_changes(control_sequence, variant_sequence):
+#     control_codons = [control_sequence[i:i+3] for i in range(0, len(control_sequence), 3)]
+#     variant_codons = [variant_sequence[i:i+3] for i in range(0, len(variant_sequence), 3)]
+#     codon_changes = sum(1 for c_codon, v_codon in zip(control_codons, variant_codons) if c_codon != v_codon)
+#     return codon_changes
+
+
 def calculate_CAI(sequence):
     pass
 
