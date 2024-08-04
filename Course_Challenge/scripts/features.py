@@ -1,28 +1,10 @@
 # from assignment3.genomical_statistics import calc_pssm
-import pandas as pd
 import numpy as np
-from seqfold import fold, dg
+from seqfold import dg
 from tqdm import tqdm
 
-# constants
-nucleotides = ['A', 'C', 'G', 'T']
-
-
-# Function to clean sequences (mainly from the quotation marks)
-def clean_sequence(sequence):
-    return ''.join([nt for nt in sequence if nt in nucleotides])
-
-
-# load necessary files:
-PSSM_matrices = pd.ExcelFile("PSSM.xlsx")
-
-anti_SD_hybridization_energy = pd.read_excel("asd_hyb.xlsx")  # anti-Shine-Dalgarno hybridization energy
-anti_SD_hybridization_energy.columns = ['Sequence', 'Energy']
-anti_SD_hybridization_energy['Sequence'] = anti_SD_hybridization_energy['Sequence'].apply(clean_sequence)
-# Create a dictionary from the DataFrame to map string to value
-mapping_anti_SD_hybridization_energy = pd.Series(anti_SD_hybridization_energy['Energy'].values,
-                                                 index=anti_SD_hybridization_energy['Sequence']).to_dict()
-
+from Course_Challenge.utils.consts import NUCLEOTIDES, load_anti_sd_hybridization_energy
+mapping_anti_SD_hybridization_energy = load_anti_sd_hybridization_energy()
 
 def calculate_gc_content(sequence):
     gc_count = sequence.count('G') + sequence.count('C')
@@ -75,7 +57,7 @@ def score_pssm_match(pssm, sequence):
     for idx in range(len(sequence)-window_length+1):
         subsequence = sequence[idx:idx + window_length]
         # print(subsequence)
-        score = sum(pssm[nucleotides.index(nt), position] for position, nt in enumerate(subsequence))
+        score = sum(pssm[NUCLEOTIDES.index(nt), position] for position, nt in enumerate(subsequence))
         idx_pssm_score[idx] = score
     return idx_pssm_score
 

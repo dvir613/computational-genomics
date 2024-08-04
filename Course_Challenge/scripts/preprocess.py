@@ -2,18 +2,21 @@
 The script should generate the features for all the sequences using the functions from features script
 '''
 
-import pandas as pd
-from sklearn.preprocessing import LabelEncoder
+from Course_Challenge.utils.consts import load_pssm_matrices, clean_sequence
 from features import *  # imports everything (functions and constants)
-from typing import Optional, Tuple, Union, List
+from igem_features.nucli_features import *
+from igem_features.entropy import *
 
 save_data = False
+
+PSSM_matrices = load_pssm_matrices()
 
 
 def generate_features(excel_file_path):
     # Load the sequence data
     features_df = pd.read_excel(excel_file_path, sheet_name='Variants data', engine='openpyxl')
-    features_df = features_df.iloc[:2, :]
+    # features_df = features_df.iloc[:30, :]
+
     # Clean the sequences
     features_df['Variant sequence'] = features_df['Variant sequence'].apply(clean_sequence)
 
@@ -48,6 +51,20 @@ def generate_features(excel_file_path):
     # Concatenate the anti-SD features to the original DataFrame
     features_df = pd.concat([features_df, anti_sd_df], axis=1)
 
+    # add nucli features
+    # Pass the entire column to the extract_nucli_features function
+    nucli_features_df = extract_nucli_features(features_df['Variant sequence'])
+
+    # Join the new features with the original DataFrame if needed
+    features_df = pd.concat([features_df, nucli_features_df], axis=1)
+
+    # entropy
+    # Pass the entire column to the extract_nucli_features function
+    entropy_feature_df = entropy(features_df['Variant sequence'])
+
+    # Join the new features with the original DataFrame if needed
+    features_df = pd.concat([features_df, entropy_feature_df], axis=1)
+
     # drop the sequences column
     features_df.drop(columns='Variant sequence', inplace=True)
 
@@ -61,7 +78,7 @@ def remove_zero_variance_features(X: pd.DataFrame):
 
 def preprocess_data(train_excel_file_path, test_excel_file_path):
     X_features_df = generate_features(train_excel_file_path)
-    print(X_features_df.head(5))
+    # print(X_features_df.head(5))
     print('number of features before zero variance remove: ', X_features_df.shape[1])
     X_features_df, zero_variance_features = remove_zero_variance_features(X_features_df)
     print('number of features after zero variance remove: ', X_features_df.shape[1])
