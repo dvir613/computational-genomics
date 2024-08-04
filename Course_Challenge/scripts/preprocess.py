@@ -92,7 +92,7 @@ def generate_features(excel_file_path):
 
 
 def remove_zero_variance_features(X: pd.DataFrame):
-    zero_variance_cols = X.columns[X.var() < X.mean() * 0.001]
+    zero_variance_cols = X.columns[X.var() <= (X.max() - X.min()) * 0.0001]
     return X.drop(columns=zero_variance_cols), zero_variance_cols
 
 
