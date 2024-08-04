@@ -7,16 +7,29 @@ from sklearn.preprocessing import LabelEncoder
 from features import *  # imports everything (functions and constants)
 from typing import Optional, Tuple, Union, List
 
-save_data = True
+save_data = False
 
 
 def generate_features(excel_file_path):
     # Load the sequence data
     features_df = pd.read_excel(excel_file_path, sheet_name='Variants data', engine='openpyxl')
+    features_df = features_df.iloc[:2, :]
     # Clean the sequences
     features_df['Variant sequence'] = features_df['Variant sequence'].apply(clean_sequence)
 
+    # calculate GC content
     features_df['GC_Content'] = features_df['Variant sequence'].apply(calculate_gc_content)
+
+    # folding energy window=40
+    folding_window_features = features_df['Variant sequence'].apply(calculate_folding_energy_window)
+    # Convert folding energy into a sparse DataFrame
+    folding_window_df = pd.DataFrame(folding_window_features.tolist(), columns=[f'folding_energy_window_40_{i}' for i in
+                                                                  range(folding_window_features.iloc[0].size)]).fillna(0)
+    # Concatenate the folding energy features to the original DataFrame
+    features_df = pd.concat([features_df, folding_window_df], axis=1)
+
+    # folding energy full
+    features_df['folding_energy'] = features_df['Variant sequence'].apply(calculate_folding_energy)
 
     # Process each PSSM matrix
     for sheet_name in PSSM_matrices.sheet_names:
@@ -48,6 +61,7 @@ def remove_zero_variance_features(X: pd.DataFrame):
 
 def preprocess_data(train_excel_file_path, test_excel_file_path):
     X_features_df = generate_features(train_excel_file_path)
+    print(X_features_df.head(5))
     print('number of features before zero variance remove: ', X_features_df.shape[1])
     X_features_df, zero_variance_features = remove_zero_variance_features(X_features_df)
     print('number of features after zero variance remove: ', X_features_df.shape[1])

@@ -1,6 +1,8 @@
-from assignment3.genomical_statistics import calc_pssm
+# from assignment3.genomical_statistics import calc_pssm
 import pandas as pd
 import numpy as np
+from seqfold import fold, dg
+from tqdm import tqdm
 
 # constants
 nucleotides = ['A', 'C', 'G', 'T']
@@ -25,6 +27,38 @@ mapping_anti_SD_hybridization_energy = pd.Series(anti_SD_hybridization_energy['E
 def calculate_gc_content(sequence):
     gc_count = sequence.count('G') + sequence.count('C')
     return gc_count / len(sequence)
+
+
+def calculate_folding_energy_window(sequence):
+    window_length = 40
+    # create a numpy array to record the indices scores
+    energy_values = np.zeros(len(sequence) - window_length + 1)
+    # energy_values = []
+    if len(sequence) < window_length:
+        return energy_values  # Return empty list if sequence is too short
+
+    # Calculate energy for each window in the sequence using Seqfold
+    for idx in tqdm(range(len(sequence) - window_length + 1)):
+        subsequence = sequence[idx:idx + window_length]
+        result = dg(subsequence, temp=37.0)  # Use Seqfold's fold function
+        energy_values[idx] = result  # Append the Gibbs free energy
+
+    return energy_values
+
+
+def calculate_folding_energy(sequence):
+    result = dg(sequence, temp=37.0)  # Use Seqfold's fold function for the entire sequence
+    return result  # Return the Gibbs free energy
+
+
+def energy_difference(variant_seq, control_seq):
+    # Calculate folding energy for both variant and control sequences
+    variant_energy = calculate_folding_energy(variant_seq)
+    control_energy = calculate_folding_energy(control_seq)
+
+    # Calculate the energy difference
+    difference = variant_energy - control_energy
+    return difference
 
 
 def calculate_pssm(sequence):

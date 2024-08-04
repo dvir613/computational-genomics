@@ -4,3 +4,5 @@ scikit-learn
 openpyxl
 matplotlib
 lazypredict
+seqfold
+biopython
