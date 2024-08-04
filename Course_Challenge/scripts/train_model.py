@@ -37,8 +37,8 @@ def scale(X1, X2):
 
 def prepare_model_data(X: pd.DataFrame, Y: pd.DataFrame, outliers=False):
     # remove the first row (the control sequence)
-    X.drop(index=0, inplace=True)
-    X.reset_index(inplace=True)  # update the indexing to start from 0 and not from 1
+    # X.drop(index=0, inplace=True)
+    # X.reset_index(inplace=True)  # update the indexing to start from 0 and not from 1
     # and remove the first column (the variant number/name)
     X.drop(columns='Variant number', inplace=True)
     Y.drop(columns='name', inplace=True)
@@ -74,8 +74,9 @@ def train_model(X_path, Y_path):
 
 def evaluate_models(X_train, X_val, Y_train, Y_val):
     models = {
-        "RandomForestRegressor": MultiOutputRegressor(RandomForestRegressor(n_estimators=100, random_state=42)),
+        "RandomForestRegressor": MultiOutputRegressor(RandomForestRegressor(n_estimators=350, random_state=42)),
         "LinearRegression": MultiOutputRegressor(LinearRegression())
+        # ,
         # "KNeighborsRegressor": MultiOutputRegressor(KNeighborsRegressor()),
         # "DecisionTreeRegressor": MultiOutputRegressor(DecisionTreeRegressor())
     }
