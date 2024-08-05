@@ -14,82 +14,148 @@ save_data = True
 PSSM_matrices = load_pssm_matrices()
 
 
-def generate_features(excel_file_path):
+# def generate_features(excel_file_path, folding_energy_file_path):
+#     # Load the sequence data
+#     variants_df = pd.read_excel(excel_file_path, sheet_name='Variants data', engine='openpyxl')
+#     # variants_df = variants_df.iloc[:30, :]
+#     features_df = pd.read_excel(excel_file_path, sheet_name='Features', engine='openpyxl')
+#     # features_df = features_df.iloc[:30, :]
+#
+#     folding_energy_df = pd.read_csv(folding_energy_file_path)
+#
+#     # Clean the sequences
+#     features_df['Variant sequence'] = variants_df['Variant sequence'].apply(clean_sequence)
+#
+#     # calculate GC content
+#     features_df['GC_Content'] = features_df['Variant sequence'].apply(calculate_gc_content)
+#
+#     # # folding energy window=40
+#     # folding_window_features = features_df['Variant sequence'].apply(calculate_folding_energy_window)
+#     # # Convert folding energy into a sparse DataFrame
+#     # folding_window_df = pd.DataFrame(folding_window_features.tolist(), columns=[f'folding_energy_window_40_{i}' for i in
+#     #                                                               range(folding_window_features.iloc[0].size)]).fillna(0)
+#     # # Concatenate the folding energy features to the original DataFrame
+#     # features_df = pd.concat([features_df, folding_window_df], axis=1)
+#     #
+#     # # folding energy full
+#     # features_df['folding_energy'] = features_df['Variant sequence'].apply(calculate_folding_energy)
+#
+#     # Process each PSSM matrix
+#     for sheet_name in PSSM_matrices.sheet_names:
+#         pssm = pd.read_excel(PSSM_matrices, sheet_name=sheet_name, index_col=0).to_numpy()
+#         pssm_scores = features_df['Variant sequence'].apply(lambda seq: score_pssm_match(pssm, seq))
+#         # Add PSSM scores to the DataFrame
+#         pssm_feature_df = pd.DataFrame(pssm_scores.tolist(), columns=[f'PSSM_{sheet_name}_{idx}' for idx in
+#                                                                       range(pssm_scores.iloc[0].size)])
+#         features_df = pd.concat([features_df, pssm_feature_df], axis=1)
+#
+#     # Calculate anti-SD hybridization energies and concatenate them to the DataFrame
+#     anti_sd_features = features_df['Variant sequence'].apply(anti_SD_hybridization_energy)
+#     # Convert anti-SD features into a sparse DataFrame
+#     anti_sd_df = pd.DataFrame(anti_sd_features.tolist(), columns=[f'anti_SD_hybridization_energy_{i}' for i in
+#                                                                   range(anti_sd_features.iloc[0].size)]).fillna(0)
+#     # Concatenate the anti-SD features to the original DataFrame
+#     features_df = pd.concat([features_df, anti_sd_df], axis=1)
+#
+#     # add nucli features
+#     # Pass the entire column to the extract_nucli_features function
+#     nucli_features_df = extract_nucli_features(features_df['Variant sequence'])
+#
+#     # Join the new features with the original DataFrame if needed
+#     features_df = pd.concat([features_df, nucli_features_df], axis=1)
+#
+#     # # entropy
+#     # that's not a good feature because it depends on all the sequences that are passed and not calculated per sequence
+#     # # Pass the entire column to the extract_nucli_features function
+#     # entropy_feature_df = entropy(features_df['Variant sequence'])
+#     #
+#     # # Join the new features with the original DataFrame if needed
+#     # features_df = pd.concat([features_df, entropy_feature_df], axis=1)
+#
+#     # promoter strength
+#     # Calculate promoter strength and concatenate them to the DataFrame
+#     promoter_energy_features = features_df['Variant sequence'].apply(sliding_window_promoter_strength)
+#     # Convert promoter strength features into a sparse DataFrame
+#     promoter_energy_df = pd.DataFrame(promoter_energy_features.tolist(), columns=[f'promoter_energy_{i}' for i in
+#                                                                   range(promoter_energy_features.iloc[0].size)]).fillna(0)
+#     # Concatenate the promoter strength features to the original DataFrame
+#     features_df = pd.concat([features_df, promoter_energy_df], axis=1)
+#
+#     # delta G
+#     # Calculate delta G and concatenate them to the DataFrame
+#     delta_G_features = process_deltaG_sequences(features_df['Variant sequence'])
+#
+#     # Concatenate the delta G features to the original DataFrame
+#     features_df = pd.concat([features_df, delta_G_features], axis=1)
+#
+#     # drop the sequences column
+#     features_df.drop(columns='Variant sequence', inplace=True)
+#
+#     return features_df
+
+
+import pandas as pd
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+from tqdm import tqdm
+
+def generate_features(excel_file_path, folding_energy_file_path):
     # Load the sequence data
     variants_df = pd.read_excel(excel_file_path, sheet_name='Variants data', engine='openpyxl')
-    # variants_df = variants_df.iloc[:30, :]
     features_df = pd.read_excel(excel_file_path, sheet_name='Features', engine='openpyxl')
-    # features_df = features_df.iloc[:30, :]
-
-    # Clean the sequences
+    folding_energy_df = pd.read_csv(folding_energy_file_path)
     features_df['Variant sequence'] = variants_df['Variant sequence'].apply(clean_sequence)
 
-    # calculate GC content
-    features_df['GC_Content'] = features_df['Variant sequence'].apply(calculate_gc_content)
+    # Define the functions to compute features
+    def compute_gc_content(df):
+        df['GC_Content'] = df['Variant sequence'].apply(calculate_gc_content)
+        return df[['GC_Content']]
 
-    # # folding energy window=40
-    # folding_window_features = features_df['Variant sequence'].apply(calculate_folding_energy_window)
-    # # Convert folding energy into a sparse DataFrame
-    # folding_window_df = pd.DataFrame(folding_window_features.tolist(), columns=[f'folding_energy_window_40_{i}' for i in
-    #                                                               range(folding_window_features.iloc[0].size)]).fillna(0)
-    # # Concatenate the folding energy features to the original DataFrame
-    # features_df = pd.concat([features_df, folding_window_df], axis=1)
-    #
-    # # folding energy full
-    # features_df['folding_energy'] = features_df['Variant sequence'].apply(calculate_folding_energy)
-
-    # Process each PSSM matrix
-    for sheet_name in PSSM_matrices.sheet_names:
+    def compute_pssm_features(df, sheet_name):
         pssm = pd.read_excel(PSSM_matrices, sheet_name=sheet_name, index_col=0).to_numpy()
-        pssm_scores = features_df['Variant sequence'].apply(lambda seq: score_pssm_match(pssm, seq))
-        # Add PSSM scores to the DataFrame
-        pssm_feature_df = pd.DataFrame(pssm_scores.tolist(), columns=[f'PSSM_{sheet_name}_{idx}' for idx in
-                                                                      range(pssm_scores.iloc[0].size)])
-        features_df = pd.concat([features_df, pssm_feature_df], axis=1)
+        pssm_scores = df['Variant sequence'].apply(lambda seq: score_pssm_match(pssm, seq))
+        return pd.DataFrame(pssm_scores.tolist(), columns=[f'PSSM_{sheet_name}_{idx}' for idx in range(pssm_scores.iloc[0].size)])
 
-    # Calculate anti-SD hybridization energies and concatenate them to the DataFrame
-    anti_sd_features = features_df['Variant sequence'].apply(anti_SD_hybridization_energy)
-    # Convert anti-SD features into a sparse DataFrame
-    anti_sd_df = pd.DataFrame(anti_sd_features.tolist(), columns=[f'anti_SD_hybridization_energy_{i}' for i in
-                                                                  range(anti_sd_features.iloc[0].size)]).fillna(0)
-    # Concatenate the anti-SD features to the original DataFrame
-    features_df = pd.concat([features_df, anti_sd_df], axis=1)
+    def compute_anti_sd_hybridization_energy(df):
+        anti_sd_features = df['Variant sequence'].apply(anti_SD_hybridization_energy)
+        return pd.DataFrame(anti_sd_features.tolist(), columns=[f'anti_SD_hybridization_energy_{i}' for i in range(anti_sd_features.iloc[0].size)]).fillna(0)
 
-    # add nucli features
-    # Pass the entire column to the extract_nucli_features function
-    nucli_features_df = extract_nucli_features(features_df['Variant sequence'])
+    def compute_nucli_features(df):
+        return extract_nucli_features(df['Variant sequence'])
 
-    # Join the new features with the original DataFrame if needed
-    features_df = pd.concat([features_df, nucli_features_df], axis=1)
+    def compute_promoter_energy(df):
+        promoter_energy_features = df['Variant sequence'].apply(sliding_window_promoter_strength)
+        return pd.DataFrame(promoter_energy_features.tolist(), columns=[f'promoter_energy_{i}' for i in range(promoter_energy_features.iloc[0].size)]).fillna(0)
 
-    # # entropy
-    # that's not a good feature because it depends on all the sequences that are passed and not calculated per sequence
-    # # Pass the entire column to the extract_nucli_features function
-    # entropy_feature_df = entropy(features_df['Variant sequence'])
-    #
-    # # Join the new features with the original DataFrame if needed
-    # features_df = pd.concat([features_df, entropy_feature_df], axis=1)
+    def compute_delta_g(df):
+        return process_deltaG_sequences(df['Variant sequence'])
 
-    # promoter strength
-    # Calculate promoter strength and concatenate them to the DataFrame
-    promoter_energy_features = features_df['Variant sequence'].apply(sliding_window_promoter_strength)
-    # Convert promoter strength features into a sparse DataFrame
-    promoter_energy_df = pd.DataFrame(promoter_energy_features.tolist(), columns=[f'promoter_energy_{i}' for i in
-                                                                  range(promoter_energy_features.iloc[0].size)]).fillna(0)
-    # Concatenate the promoter strength features to the original DataFrame
-    features_df = pd.concat([features_df, promoter_energy_df], axis=1)
+    # List of tasks to run in parallel
+    tasks = [
+        (partial(compute_gc_content, features_df), 'Computing GC Content'),
+        (partial(compute_anti_sd_hybridization_energy, features_df), 'Computing anti-SD Hybridization Energy'),
+        (partial(compute_nucli_features, features_df), 'Extracting Nucleic Features'),
+        (partial(compute_promoter_energy, features_df), 'Computing Promoter Energy'),
+        (partial(compute_delta_g, features_df), 'Computing Delta G'),
+    ]
 
-    # delta G
-    # Calculate delta G and concatenate them to the DataFrame
-    delta_G_features = process_deltaG_sequences(features_df['Variant sequence'])
+    for sheet_name in PSSM_matrices.sheet_names:
+        tasks.append((partial(compute_pssm_features, features_df, sheet_name), f'Computing PSSM Features for {sheet_name}'))
 
-    # Concatenate the delta G features to the original DataFrame
-    features_df = pd.concat([features_df, delta_G_features], axis=1)
+    # Execute tasks in parallel with progress bar
+    results = []
+    with ThreadPoolExecutor() as executor:
+        futures = {executor.submit(task[0]): task[1] for task in tasks}
+        for future in tqdm(futures, total=len(futures), desc='Processing Features'):
+            results.append(future.result())
 
-    # drop the sequences column
-    features_df.drop(columns='Variant sequence', inplace=True)
+    # Concatenate all results and folding_energy_df
+    results_df = pd.concat([features_df] + results + [folding_energy_df], axis=1)
 
-    return features_df
+    # Drop the sequences column
+    results_df.drop(columns='Variant sequence', inplace=True, errors='ignore')
+
+    return results_df
 
 
 def remove_zero_variance_features(X: pd.DataFrame):
@@ -97,13 +163,13 @@ def remove_zero_variance_features(X: pd.DataFrame):
     return X.drop(columns=zero_variance_cols), zero_variance_cols
 
 
-def preprocess_data(train_excel_file_path, test_excel_file_path):
-    X_features_df = generate_features(train_excel_file_path)
+def preprocess_data(train_excel_file_path, train_folding_energy_features_path, test_excel_file_path, test_folding_energy_features_path):
+    X_features_df = generate_features(train_excel_file_path, train_folding_energy_features_path)
     # print(X_features_df.head(5))
     print('number of features before zero variance remove: ', X_features_df.shape[1])
     X_features_df, zero_variance_features = remove_zero_variance_features(X_features_df)
     print('number of features after zero variance remove: ', X_features_df.shape[1])
-    Y_features_df = generate_features(test_excel_file_path)
+    Y_features_df = generate_features(test_excel_file_path, test_folding_energy_features_path)
     # drop from the test data features the same features dropped from the train data
     Y_features_df.drop(columns=zero_variance_features, inplace=True)
     return X_features_df, Y_features_df
@@ -118,8 +184,11 @@ def save_dataframe_in_chunks(df, filename, chunk_size=100000):
 
 
 train_data_file_path = "../data/Train_data.xlsx"
+train_folding_energy_features_path = "../data/Train_data_folding_energy_features.csv"
 test_data_file_path = "../data/Test_data.xlsx"
-X_train_processed_features_df, X_test_processed_features_df = preprocess_data(train_data_file_path, test_data_file_path)
+test_folding_energy_features_path = "../data/Test_data_folding_energy_features.csv"
+X_train_processed_features_df, X_test_processed_features_df = preprocess_data(train_data_file_path, train_folding_energy_features_path,
+                                                                              test_data_file_path, test_folding_energy_features_path)
 
 if save_data:
     # Save the DataFrame in chunks to manage memory usage better
