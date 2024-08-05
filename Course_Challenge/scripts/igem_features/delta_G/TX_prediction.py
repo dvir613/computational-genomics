@@ -158,7 +158,7 @@ def apply_sliding_window(sequence: str, window_length=41) -> pd.DataFrame:
 
 def process_deltaG_sequences(sequence_series: pd.Series, window_length=41) -> pd.DataFrame:
     all_results = []
-    for sequence in tqdm(sequence_series, desc='Processing deltaG with sliding window'):
+    for sequence in sequence_series:
         result_df = apply_sliding_window(sequence, window_length)
         all_results.append(result_df)
 
