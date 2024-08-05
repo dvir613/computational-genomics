@@ -56,7 +56,7 @@ def prepare_model_data(X: pd.DataFrame, Y: pd.DataFrame, outliers=False):
 def train_model(X_path, Y_path):
     X = pd.read_csv(X_path)
     Y = pd.read_csv(Y_path)
-    X_train, X_val, Y_train, Y_val = prepare_model_data(X, Y, outliers=True)
+    X_train, X_val, Y_train, Y_val = prepare_model_data(X, Y, outliers=False)
 
     # Evaluate models
     results = evaluate_models(X_train, X_val, Y_train, Y_val)

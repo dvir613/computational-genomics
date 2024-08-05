@@ -62,12 +62,13 @@ def generate_features(excel_file_path):
     # Join the new features with the original DataFrame if needed
     features_df = pd.concat([features_df, nucli_features_df], axis=1)
 
-    # entropy
-    # Pass the entire column to the extract_nucli_features function
-    entropy_feature_df = entropy(features_df['Variant sequence'])
-
-    # Join the new features with the original DataFrame if needed
-    features_df = pd.concat([features_df, entropy_feature_df], axis=1)
+    # # entropy
+    # that's not a good feature because it depends on all the sequences that are passed and not calculated per sequence
+    # # Pass the entire column to the extract_nucli_features function
+    # entropy_feature_df = entropy(features_df['Variant sequence'])
+    #
+    # # Join the new features with the original DataFrame if needed
+    # features_df = pd.concat([features_df, entropy_feature_df], axis=1)
 
     # promoter strength
     # Calculate promoter strength and concatenate them to the DataFrame
@@ -92,7 +93,7 @@ def generate_features(excel_file_path):
 
 
 def remove_zero_variance_features(X: pd.DataFrame):
-    zero_variance_cols = X.columns[X.var() <= (X.max() - X.min()) * 0.0001]
+    zero_variance_cols = X.columns[X.var() == 0]
     return X.drop(columns=zero_variance_cols), zero_variance_cols
 
 
