@@ -2,23 +2,38 @@ features
 Variant number
 A__AAG_count
 A__CAG_count
+A_GTC_count
+AA__AAA_count
 AA__AGG_count
 AAA_CG_count
 AAG__AC_count
 AAT_CA_count
+AC__GCA_count
+AG_C_count
+AG_CGC_count
 AG_CTT_count
+AGC_C_count
+AGG_TT_count
 AT__CG_count
 AT__CTC_count
 AT_C_count
 ATG__CA_count
+C__TA_count
+C_CAA_count
 C_TCC_count
 CA__CT_count
 CA_TTA_count
 CAA__CG_count
 CAA_AT_count
 CAA_GA_count
+CAC_A_count
 CC__T_count
+CCA__GC_count
+CGA__A_count
 CT_AG_count
+dG_apparent_201
+dG_apparent_207
+dG_total_133
 dG_total_177
 dG_total_277
 folding_energy_window_40_113
@@ -27,10 +42,15 @@ folding_energy_window_40_121
 folding_energy_window_40_125
 folding_energy_window_40_128
 folding_energy_window_40_132
+folding_energy_window_40_150
 folding_energy_window_40_156
+folding_energy_window_40_157
+folding_energy_window_40_165
+folding_energy_window_40_168
 folding_energy_window_40_171
 folding_energy_window_40_183
 folding_energy_window_40_198
+folding_energy_window_40_219
 folding_energy_window_40_241
 folding_energy_window_40_259
 folding_energy_window_40_260
@@ -41,20 +61,49 @@ folding_energy_window_40_304
 folding_energy_window_40_332
 folding_energy_window_40_385
 folding_energy_window_40_386
+folding_energy_window_40_395
+folding_energy_window_40_395
 folding_energy_window_40_98
 G__C_count
+G__GTG_count
+G_TCC_count
 GAC_C_count
 GC__TAT_count
 GC_A_count
 GC_GCA_count
+GCA__A_count
 GCC_AA_count
 GCC_AT_count
 GT__ACT_count
+promoter_energy_135
+promoter_energy_140
+promoter_energy_148
+PSSM_Motif 1_178
+PSSM_Motif 1_183
 PSSM_Motif 1_211
+PSSM_Motif 1_224
+PSSM_Motif 1_279
+PSSM_Motif 11_106
 PSSM_Motif 11_151
+PSSM_Motif 11_170
+PSSM_Motif 11_173
+PSSM_Motif 11_175
+PSSM_Motif 11_178
+PSSM_Motif 11_182
+PSSM_Motif 11_183
+PSSM_Motif 11_185
+PSSM_Motif 11_188
+PSSM_Motif 11_199
 PSSM_Motif 12_167
+PSSM_Motif 12_175
+PSSM_Motif 12_179
+PSSM_Motif 12_357
 PSSM_Motif 2_147
+PSSM_Motif 2_185
+PSSM_Motif 2_198
 PSSM_Motif 2_248
+PSSM_Motif 2_307
+PSSM_Motif 2_309
 PSSM_Motif 3_121
 PSSM_Motif 3_128
 PSSM_Motif 3_130
@@ -63,7 +112,9 @@ PSSM_Motif 3_134
 PSSM_Motif 3_135
 PSSM_Motif 3_137
 PSSM_Motif 3_138
+PSSM_Motif 3_182
 PSSM_Motif 3_183
+PSSM_Motif 3_188
 PSSM_Motif 3_214
 PSSM_Motif 3_238
 PSSM_Motif 3_246
@@ -91,27 +142,51 @@ PSSM_Motif 3_420
 PSSM_Motif 3_422
 PSSM_Motif 3_423
 PSSM_Motif 3_424
+PSSM_Motif 4_178
+PSSM_Motif 4_182
+PSSM_Motif 4_188
+PSSM_Motif 5_199
+PSSM_Motif 5_212
 PSSM_Motif 5_216
 PSSM_Motif 6_168
+PSSM_Motif 6_184
 PSSM_Motif 6_199
 PSSM_Motif 6_209
 PSSM_Motif 7_166
+PSSM_Motif 7_198
 PSSM_Motif 7_322
 PSSM_Motif 8_104
 PSSM_Motif 8_164
+PSSM_Motif 8_179
+PSSM_Motif 9_156
 PSSM_Motif 9_222
+T_CTA_count
 T_GC_count
+T_TCC_count
 T_TTT_count
 TA__AGG_count
+TA_AAG_count
 TAA__CA_count
 TAG_AA_count
 TAT__C_count
 TAT_A_count
+TC__CT_count
 TC_GG_count
+TCC__A_count
+TGC_AA_count
 TT__ACA_count
+TT__TTA_count
+TTG_T_count
+Tx_rate_120
+Tx_rate_133
 Tx_rate_135
 Tx_rate_138
 Tx_rate_140
 Tx_rate_143
+Tx_rate_154
+Tx_rate_155
+Tx_rate_179
+Tx_rate_193
 Tx_rate_301
+Tx_rate_332
 Tx_rate_7
