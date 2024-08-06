@@ -1,0 +1,117 @@
+features
+Variant number
+A__AAG_count
+A__CAG_count
+AA__AGG_count
+AAA_CG_count
+AAG__AC_count
+AAT_CA_count
+AG_CTT_count
+AT__CG_count
+AT__CTC_count
+AT_C_count
+ATG__CA_count
+C_TCC_count
+CA__CT_count
+CA_TTA_count
+CAA__CG_count
+CAA_AT_count
+CAA_GA_count
+CC__T_count
+CT_AG_count
+dG_total_177
+dG_total_277
+folding_energy_window_40_113
+folding_energy_window_40_114
+folding_energy_window_40_121
+folding_energy_window_40_125
+folding_energy_window_40_128
+folding_energy_window_40_132
+folding_energy_window_40_156
+folding_energy_window_40_171
+folding_energy_window_40_183
+folding_energy_window_40_198
+folding_energy_window_40_241
+folding_energy_window_40_259
+folding_energy_window_40_260
+folding_energy_window_40_292
+folding_energy_window_40_296
+folding_energy_window_40_297
+folding_energy_window_40_304
+folding_energy_window_40_332
+folding_energy_window_40_385
+folding_energy_window_40_386
+folding_energy_window_40_98
+G__C_count
+GAC_C_count
+GC__TAT_count
+GC_A_count
+GC_GCA_count
+GCC_AA_count
+GCC_AT_count
+GT__ACT_count
+PSSM_Motif 1_211
+PSSM_Motif 11_151
+PSSM_Motif 12_167
+PSSM_Motif 2_147
+PSSM_Motif 2_248
+PSSM_Motif 3_121
+PSSM_Motif 3_128
+PSSM_Motif 3_130
+PSSM_Motif 3_133
+PSSM_Motif 3_134
+PSSM_Motif 3_135
+PSSM_Motif 3_137
+PSSM_Motif 3_138
+PSSM_Motif 3_183
+PSSM_Motif 3_214
+PSSM_Motif 3_238
+PSSM_Motif 3_246
+PSSM_Motif 3_247
+PSSM_Motif 3_248
+PSSM_Motif 3_250
+PSSM_Motif 3_251
+PSSM_Motif 3_252
+PSSM_Motif 3_253
+PSSM_Motif 3_254
+PSSM_Motif 3_256
+PSSM_Motif 3_257
+PSSM_Motif 3_258
+PSSM_Motif 3_260
+PSSM_Motif 3_266
+PSSM_Motif 3_296
+PSSM_Motif 3_305
+PSSM_Motif 3_372
+PSSM_Motif 3_410
+PSSM_Motif 3_414
+PSSM_Motif 3_416
+PSSM_Motif 3_418
+PSSM_Motif 3_419
+PSSM_Motif 3_420
+PSSM_Motif 3_422
+PSSM_Motif 3_423
+PSSM_Motif 3_424
+PSSM_Motif 5_216
+PSSM_Motif 6_168
+PSSM_Motif 6_199
+PSSM_Motif 6_209
+PSSM_Motif 7_166
+PSSM_Motif 7_322
+PSSM_Motif 8_104
+PSSM_Motif 8_164
+PSSM_Motif 9_222
+T_GC_count
+T_TTT_count
+TA__AGG_count
+TAA__CA_count
+TAG_AA_count
+TAT__C_count
+TAT_A_count
+TC_GG_count
+TT__ACA_count
+Tx_rate_135
+Tx_rate_138
+Tx_rate_140
+Tx_rate_143
+Tx_rate_301
+Tx_rate_7
