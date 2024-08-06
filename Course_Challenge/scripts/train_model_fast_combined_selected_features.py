@@ -46,9 +46,14 @@ def prepare_model_data(X: pd.DataFrame, Y: pd.DataFrame, outliers=False):
 
     return X_train, X_test, Y_train, Y_test
 
-def train_model(X_path, Y_path):
+def train_model(X_path, Y_path, selected_features_path=None):
     X = pd.read_csv(X_path)
     Y = pd.read_csv(Y_path)
+    if selected_features_path:
+        selected_features = pd.read_csv(selected_features_path)
+        feature_names = selected_features.iloc[:, 0].tolist()
+        print(feature_names)
+        X = X[feature_names]
     X_train, X_val, Y_train, Y_val = prepare_model_data(X, Y, outliers=False)
 
     # Evaluate models
@@ -86,16 +91,16 @@ def parallel_feature_selection(model, X_train, Y_train, n_features=40):
 def evaluate_models(X_train, X_val, Y_train, Y_val):
     models = {
         "RandomForestRegressor": MultiOutputRegressor(RandomForestRegressor(n_estimators=350, random_state=42)),
-        "LinearRegression": MultiOutputRegressor(LinearRegression()),
-        "Lasso": MultiOutputRegressor(Lasso()),
-        "Ridge": MultiOutputRegressor(Ridge()),
+        # "LinearRegression": MultiOutputRegressor(LinearRegression()),
+        # "Lasso": MultiOutputRegressor(Lasso()),
+        # "Ridge": MultiOutputRegressor(Ridge()),
         "XGBRegressor": MultiOutputRegressor(XGBRegressor(objective='reg:squarederror', n_estimators=100, random_state=42, tree_method='hist', device='cuda'))
     }
 
     # selected_features = {}
 
     def train_and_evaluate_model(name, model):
-        sfs = parallel_feature_selection(model, X_train, Y_train, n_features=40)
+        sfs = parallel_feature_selection(model, X_train, Y_train, n_features=50)
         X_train_sfs = sfs.transform(X_train)
         X_val_sfs = sfs.transform(X_val)
         model.fit(X_train_sfs, Y_train)
@@ -106,7 +111,7 @@ def evaluate_models(X_train, X_val, Y_train, Y_val):
         selected_features = X_train.columns[sfs.get_support()].tolist()
         print(selected_features)
         df = pd.DataFrame(selected_features)
-        df.to_csv(f'selected_features_{name}.csv', index=False)
+        df.to_csv(f'selected_features_combined_{name}.csv', index=False)
         return name, {"MSE": mse, "R2": r2, "Spearman": spearman_corr}
 
     results = Parallel(n_jobs=-1)(delayed(train_and_evaluate_model)(name, model) for name, model in tqdm(models.items()))
@@ -128,4 +133,5 @@ def evaluate_models(X_train, X_val, Y_train, Y_val):
 #     df.to_csv('selected_features.csv', index=False)
 
 
-train_model("../data/Train_data_with_features.csv", "../data/Target_data.csv")
+train_model("../data/Train_data_with_features.csv", "../data/Target_data.csv",
+            selected_features_path="selected_features_combined.csv")
