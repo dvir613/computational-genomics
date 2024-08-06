@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.tree import DecisionTreeRegressor
 from sklearn.linear_model import LinearRegression, Lasso, Ridge
 from xgboost import XGBRegressor
 from sklearn.metrics import mean_squared_error, r2_score, make_scorer
@@ -77,24 +78,44 @@ def train_model(X_path, Y_path, selected_features_path=None):
 def spearman_scorer(y_true, y_pred):
     return spearmanr(y_true, y_pred)[0]
 
-def parallel_feature_selection(model, X_train, Y_train, n_features=40):
+
+def parallel_feature_selection(model, X_train, Y_train, n_features=30):
     sfs = SequentialFeatureSelector(
         model.estimator,
         n_features_to_select=n_features,
         direction='forward',
-        scoring=make_scorer(mean_squared_error),
+        scoring='neg_mean_squared_error',
         n_jobs=-1
     )
-    sfs.fit(X_train, Y_train)
+
+    n_iterations = X_train.shape[1] * n_features
+    with tqdm(total=n_iterations, desc="Feature Selection", unit="iteration") as pbar:
+        for i in range(n_iterations):
+            sfs._fit_transform = sfs.fit(X_train, Y_train)
+            pbar.update()
+
     return sfs
+
+
+# def parallel_feature_selection(model, X_train, Y_train, n_features=40):
+#     sfs = SequentialFeatureSelector(
+#         model.estimator,
+#         n_features_to_select=n_features,
+#         direction='forward',
+#         scoring=make_scorer(mean_squared_error),
+#         n_jobs=-1
+#     )
+#     sfs.fit(X_train, Y_train)
+#     return sfs
 
 def evaluate_models(X_train, X_val, Y_train, Y_val):
     models = {
-        "RandomForestRegressor": MultiOutputRegressor(RandomForestRegressor(n_estimators=350, random_state=42)),
+        # "RandomForestRegressor": MultiOutputRegressor(RandomForestRegressor(n_estimators=100, random_state=42))
+        "DecisionTreeRegressor": MultiOutputRegressor(DecisionTreeRegressor(random_state=42))
         # "LinearRegression": MultiOutputRegressor(LinearRegression()),
         # "Lasso": MultiOutputRegressor(Lasso()),
         # "Ridge": MultiOutputRegressor(Ridge()),
-        "XGBRegressor": MultiOutputRegressor(XGBRegressor(objective='reg:squarederror', n_estimators=100, random_state=42, tree_method='hist', device='cuda'))
+        # "XGBRegressor": MultiOutputRegressor(XGBRegressor(objective='reg:squarederror', n_estimators=100, random_state=42, tree_method='hist', device='cuda'))
     }
 
     # selected_features = {}
@@ -118,19 +139,6 @@ def evaluate_models(X_train, X_val, Y_train, Y_val):
 
     return dict(results)
 
-
-# def save_selected_features(selected_features, model):
-#     # Combine all selected features into a DataFrame
-#     features_data = {
-#         "Model": [],
-#         "Selected Features": []
-#     }
-#     for model_name, features in selected_features.items():
-#         features_data["Model"].append(model_name)
-#         features_data["Selected Features"].append(", ".join(features))
-#
-#     df = pd.DataFrame(features_data)
-#     df.to_csv('selected_features.csv', index=False)
 
 
 train_model("../data/Train_data_with_features.csv", "../data/Target_data.csv",

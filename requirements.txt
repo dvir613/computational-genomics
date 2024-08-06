@@ -31,3 +31,4 @@ tzdata==2024.1
 wheel==0.41.2
 xgboost==2.1.1
 zipp==3.19.2
+umap-learn
